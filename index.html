@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz with Wallet</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="heading">Quiz</h1>
+        <div id="initial-options" class="initial-options">
+            <button id="add-funds">Add Funds</button>
+            <button id="play-for-free">Play for Free</button>
+        </div>
+        <div id="department-options" class="department-options" style="display: none;">
+            <button data-department="English">English</button>
+            <button data-department="Mathematics">Mathematics</button>
+            <button data-department="Biology">Biology</button>
+            <button data-department="Chemistry">Chemistry</button>
+            <button data-department="Physics">Physics</button>
+            <button data-department="Computer">Computer Science</button>
+            <button data-department="Geography">Geography</button>
+            <button data-department="History">History</button>
+        </div>
+        <div id="wallet" class="wallet" style="display: none;">
+            <p>Balance: <span id="wallet-balance">0</span></p>
+        </div>
+        <div id="question" class="question" style="display: none;"></div>
+        <div id="answers" class="answers" style="display: none;"></div>
+        <div id="score" class="score" style="display: none;"></div>
+        <div id="question-options" class="question-options" style="display: none;">
+            <button data-questions="10">10 Questions</button>
+            <button data-questions="20">20 Questions</button>
+            <button data-questions="30">30 Questions</button>
+            <button data-questions="40">40 Questions</button>
+            <button data-questions="50">50 Questions</button>
+        </div>
+        <button id="cancel-button" style="display: none;">Cancel</button>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-firestore.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="script.js"></script>
+</body>
+</html>
