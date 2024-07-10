@@ -20,73 +20,38 @@ document.addEventListener('DOMContentLoaded', () => {
     let totalQuestions = 10; // Default number of questions
     let quizData = [];
     let countdownInterval;
+    let countdownTimeout;
+
     const countdownTime = 30; // 30 seconds
     const feedbackTime = 1000; // 1 second feedback display
-    let playForFree = false;
 
-    const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_AUTH_DOMAIN",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_STORAGE_BUCKET",
-        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-        appId: "YOUR_APP_ID"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    function fetchQuestions(department) {
+        const categoryMap = {
+            "English": 10,
+            "Mathematics": 19,
+            "Biology": 17,
+            "Chemistry": 17,
+            "Physics": 17,
+            "Computer": 18,
+            "Geography": 22,
+            "History": 23
+        };
 
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            updateWalletBalanceUI(user.uid);
-        }
-    });
-
-    function updateWalletBalance(userId, amount) {
-        const userRef = db.collection('users').doc(userId);
-        return userRef.update({
-            walletBalance: firebase.firestore.FieldValue.increment(amount)
-        });
-    }
-
-    function getWalletBalance(userId) {
-        return db.collection('users').doc(userId).get().then(doc => doc.data().walletBalance);
-    }
-
-    function updateWalletBalanceUI(userId) {
-        getWalletBalance(userId).then(balance => {
-            walletBalanceElement.textContent = balance;
-            initialOptionsElement.style.display = 'none';
-            walletElement.style.display = 'block';
-        });
-    }
-
-    async function fetchQuestions(department) {
-        try {
-            const categoryMap = {
-                "English": 10,
-                "Mathematics": 19,
-                "Biology": 17,
-                "Chemistry": 17,
-                "Physics": 17,
-                "Computer Science": 18,
-                "Geography": 22,
-                "History": 23
-            };
-            const response = await fetch(`https://opentdb.com/api.php?amount=${totalQuestions}&category=${categoryMap[department]}&type=multiple`);
-            const data = await response.json();
-            quizData = data.results.map((item) => {
-                const formattedQuestion = {
-                    question: item.question,
-                    options: [...item.incorrect_answers, item.correct_answer],
-                    correct: item.correct_answer
-                };
-                // Shuffle the options
-                formattedQuestion.options.sort(() => Math.random() - 0.5);
-                return formattedQuestion;
-            });
-        } catch (error) {
-            console.error('Error fetching questions:', error);
-        }
+        return fetch(`https://opentdb.com/api.php?amount=${totalQuestions}&category=${categoryMap[department]}&type=multiple`)
+            .then(response => response.json())
+            .then(data => {
+                quizData = data.results.map((item) => {
+                    const formattedQuestion = {
+                        question: item.question,
+                        options: [...item.incorrect_answers, item.correct_answer],
+                        correct: item.correct_answer
+                    };
+                    // Shuffle the options
+                    formattedQuestion.options.sort(() => Math.random() - 0.5);
+                    return formattedQuestion;
+                });
+            })
+            .catch(error => console.error('Error fetching questions:', error));
     }
 
     function startQuiz(department) {
@@ -162,25 +127,21 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(countdownInterval);
 
         const currentQuestion = quizData[currentQuestionIndex];
-        if (selectedElement) {
-            if (selectedOption === currentQuestion.correct) {
-                selectedElement.style.backgroundColor = 'green';
-                score++;
-            } else {
-                selectedElement.style.backgroundColor = 'red';
-            }
+        const correctAnswer = currentQuestion.correct;
+
+        if (selectedOption === correctAnswer) {
+            selectedElement.style.background = 'green'; // Correct answer
+            score++;
+        } else if (selectedOption !== null) {
+            selectedElement.style.background = 'red'; // Incorrect answer
         }
 
-        // Disable all answer buttons after selection or timeout
-        const allAnswerElements = document.querySelectorAll('.answer');
-        allAnswerElements.forEach(answer => {
-            answer.style.pointerEvents = 'none';
-            if (answer.textContent === currentQuestion.correct) {
-                answer.style.backgroundColor = 'green';
-            }
-        });
+        // Show correct answer
+        const correctIndex = currentQuestion.options.findIndex(opt => opt === correctAnswer);
+        answersElement.children[correctIndex].style.background = 'green';
 
-        setTimeout(() => {
+        // Move to next question after feedback
+        countdownTimeout = setTimeout(() => {
             currentQuestionIndex++;
             generateQuiz();
         }, feedbackTime);
@@ -189,53 +150,52 @@ document.addEventListener('DOMContentLoaded', () => {
     function restartQuiz() {
         currentQuestionIndex = 0;
         score = 0;
-        questionOptionsElement.style.display = 'block';
-        document.getElementById('question').style.display = 'none';
-        document.getElementById('answers').style.display = 'none';
-        document.getElementById('score').style.display = 'none';
-        document.getElementById('cancel-button').style.display = 'none'; // Hide cancel button
+        quizData = []; // Reset quiz data
+        generateQuiz();
     }
 
     function exitQuiz() {
-        initialOptionsElement.style.display = 'block';
-        walletElement.style.display = 'none';
-        document.getElementById('question').style.display = 'none';
-        document.getElementById('answers').style.display = 'none';
-        document.getElementById('score').style.display = 'none';
-        document.getElementById('cancel-button').style.display = 'none'; // Hide cancel button
-    }
-
-    cancelButton.addEventListener('click', () => {
-        // Calculate score up to the current question index
-        const finalScore = score;
         currentQuestionIndex = 0;
         score = 0;
-        questionElement.textContent = `You scored ${finalScore} out of ${totalQuestions}`;
-        answersElement.innerHTML = '';
+        quizData = []; // Reset quiz data
+        initialOptionsElement.style.display = 'block';
+        departmentOptionsElement.style.display = 'none';
+        questionElement.style.display = 'none';
+        answersElement.style.display = 'none';
+        scoreElement.style.display = 'none';
+        walletElement.style.display = 'none';
+        cancelButton.style.display = 'none';
+        clearInterval(countdownInterval);
+        clearTimeout(countdownTimeout);
         countdownElement.innerHTML = '';
-        clearInterval(countdownInterval); // Stop countdown
-        document.getElementById('cancel-button').style.display = 'none'; // Hide cancel button
-    });
+    }
 
     playForFreeButton.addEventListener('click', () => {
         initialOptionsElement.style.display = 'none';
         departmentOptionsElement.style.display = 'block';
     });
 
-    departmentOptionsElement.addEventListener('click', (event) => {
-        if (event.target.tagName === 'BUTTON') {
-            const department = event.target.getAttribute('data-department');
-            startQuiz(department); // Start quiz with the selected department
+    addFundsButton.addEventListener('click', () => {
+        // Simulate login or prompt for login here
+        walletElement.style.display = 'block';
+    });
+
+    cancelButton.addEventListener('click', () => {
+        const confirmExit = confirm('Are you sure you want to cancel the quiz?');
+        if (confirmExit) {
+            clearInterval(countdownInterval);
+            clearTimeout(countdownTimeout);
+            countdownElement.innerHTML = '';
+            location.reload(); // Reload the page to refresh the quiz
         }
     });
 
-    addFundsButton.addEventListener('click', () => {
-        const amount = parseInt(prompt('Enter amount to add:'));
-        firebase.auth().signInAnonymously().then((cred) => {
-            updateWalletBalance(cred.user.uid, amount).then(() => {
-                updateWalletBalanceUI(cred.user.uid);
-            });
-        });
+    // Populate questions based on department selected
+    departmentOptionsElement.addEventListener('click', (event) => {
+        if (event.target.tagName === 'BUTTON') {
+            const department = event.target.getAttribute('data-department');
+            startQuiz(department);
+        }
     });
 
 });
