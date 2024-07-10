@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let totalQuestions = 10; // Default number of questions
     let quizData = [];
     let countdownInterval;
-    const countdownTime = 10; // 30 seconds
+    const countdownTime = 30; // 30 seconds
     const feedbackTime = 1000; // 1 second feedback display
     let playForFree = false;
 
