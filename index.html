@@ -6,12 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz with Wallet</title>
     <link rel="stylesheet" href="style.css">
+    <script defer src="script.js"></script>
 </head>
 <body>
     <div class="container">
         <h1 class="heading">Quiz</h1>
         <div id="initial-options" class="initial-options">
-            <button id="add-funds">Add Funds</button>
+            <button id="add-funds" data-modal-target="#modal">Add Funds</button>
             <button id="play-for-free">Play for Free</button>
         </div>
         <div id="department-options" class="department-options" style="display: none;">
@@ -39,6 +40,16 @@
         </div>
         <button id="cancel-button" style="display: none;">Cancel</button>
     </div>
-    <script src="script.js"></script>
+
+    <div class="modal" id="modal">
+        <div class="modal-header">
+            <div class="title">Update Notice</div>
+            <button data-close-button class="close-button">&times;</button>
+        </div>
+        <div class="modal-body">
+            We are updating it very soon.
+        </div>
+    </div>
+    <div id="overlay"></div>
 </body>
 </html>
