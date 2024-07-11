@@ -20,10 +20,46 @@ document.addEventListener('DOMContentLoaded', () => {
     let totalQuestions = 10; // Default number of questions
     let quizData = [];
     let countdownInterval;
-    let countdownTimeout;
-
     const countdownTime = 30; // 30 seconds
     const feedbackTime = 1000; // 1 second feedback display
+
+    // Modal functionality
+    const openModalButtons = document.querySelectorAll('[data-modal-target]');
+    const closeModalButtons = document.querySelectorAll('[data-close-button]');
+    const overlay = document.getElementById('overlay');
+
+    openModalButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const modal = document.querySelector(button.dataset.modalTarget);
+            openModal(modal);
+        });
+    });
+
+    overlay.addEventListener('click', () => {
+        const modals = document.querySelectorAll('.modal.active');
+        modals.forEach(modal => {
+            closeModal(modal);
+        });
+    });
+
+    closeModalButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const modal = button.closest('.modal');
+            closeModal(modal);
+        });
+    });
+
+    function openModal(modal) {
+        if (modal == null) return;
+        modal.classList.add('active');
+        overlay.classList.add('active');
+    }
+
+    function closeModal(modal) {
+        if (modal == null) return;
+        modal.classList.remove('active');
+        overlay.classList.remove('active');
+    }
 
     function fetchQuestions(department) {
         const categoryMap = {
@@ -32,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "Biology": 17,
             "Chemistry": 17,
             "Physics": 17,
-            "Computer": 18,
+            "Computer Science": 18,
             "Geography": 22,
             "History": 23
         };
@@ -55,6 +91,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startQuiz(department) {
+        // Reset necessary variables
+        currentQuestionIndex = 0;
+        score = 0;
+        quizData = [];
+        
         departmentOptionsElement.style.display = 'none';
         questionOptionsElement.style.display = 'block';
         questionOptionsElement.addEventListener('click', (event) => {
@@ -69,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     generateQuiz();
                 });
             }
-        });
+        }, { once: true }); // Ensures this listener runs only once
     }
 
     function generateQuiz() {
@@ -77,97 +118,77 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentQuestion = quizData[currentQuestionIndex];
             questionElement.innerHTML = currentQuestion.question;
             answersElement.innerHTML = ''; // Clear previous answers
-            countdownElement.innerHTML = ''; // Clear previous countdown
+            countdownElement.style.display = 'block'; // Ensure countdown is visible
+            countdownElement.innerHTML = `Time left: ${countdownTime} seconds`;
 
             currentQuestion.options.forEach((option) => {
-                const answerDiv = document.createElement('div');
-                answerDiv.className = 'answer';
-                answerDiv.textContent = option;
-                answerDiv.onclick = () => handleAnswerClick(option, answerDiv);
-                answersElement.appendChild(answerDiv);
+                const button = document.createElement('button');
+                button.innerHTML = option;
+                button.addEventListener('click', () => checkAnswer(option, button, currentQuestion.correct));
+                answersElement.appendChild(button);
             });
 
             startCountdown();
         } else {
-            // Display final score with restart and exit options
-            questionElement.textContent = `You scored ${score} out of ${totalQuestions}`;
-            answersElement.innerHTML = '';
-
-            const restartButton = document.createElement('button');
-            restartButton.textContent = 'Restart';
-            restartButton.onclick = () => restartQuiz();
-
-            const exitButton = document.createElement('button');
-            exitButton.textContent = 'Exit';
-            exitButton.onclick = () => exitQuiz();
-
-            answersElement.appendChild(restartButton);
-            answersElement.appendChild(exitButton);
-
-            countdownElement.innerHTML = '';
+            showScore();
         }
     }
 
     function startCountdown() {
         let timeLeft = countdownTime;
-        countdownElement.textContent = `${timeLeft}`;
-
+        clearInterval(countdownInterval); // Clear any existing interval
         countdownInterval = setInterval(() => {
             timeLeft--;
-            countdownElement.textContent = `${timeLeft}`;
-
+            countdownElement.innerHTML = `Time left: ${timeLeft} seconds`;
             if (timeLeft <= 0) {
                 clearInterval(countdownInterval);
-                handleAnswerClick(null, null); // No answer selected
+                markAnswer(null); // Mark unanswered question as incorrect
             }
         }, 1000);
     }
 
-    function handleAnswerClick(selectedOption, selectedElement) {
-        clearInterval(countdownInterval);
+    function checkAnswer(selectedAnswer, button, correctAnswer) {
+        clearInterval(countdownInterval); // Stop the countdown
 
-        const currentQuestion = quizData[currentQuestionIndex];
-        const correctAnswer = currentQuestion.correct;
-
-        if (selectedOption === correctAnswer) {
-            selectedElement.style.background = 'green'; // Correct answer
+        if (selectedAnswer === correctAnswer) {
+            button.style.backgroundColor = 'green';
             score++;
-        } else if (selectedOption !== null) {
-            selectedElement.style.background = 'red'; // Incorrect answer
+        } else {
+            button.style.backgroundColor = 'red';
+            // Highlight the correct answer
+            Array.from(answersElement.children).forEach((child) => {
+                if (child.innerHTML === correctAnswer) {
+                    child.style.backgroundColor = 'green';
+                }
+            });
         }
 
-        // Show correct answer
-        const correctIndex = currentQuestion.options.findIndex(opt => opt === correctAnswer);
-        answersElement.children[correctIndex].style.background = 'green';
-
-        // Move to next question after feedback
-        countdownTimeout = setTimeout(() => {
+        setTimeout(() => {
             currentQuestionIndex++;
             generateQuiz();
         }, feedbackTime);
     }
 
-    function restartQuiz() {
-        currentQuestionIndex = 0;
-        score = 0;
-        quizData = []; // Reset quiz data
-        generateQuiz();
+    function markAnswer(answer) {
+        if (answer === null) {
+            // No answer selected, mark as incorrect
+            Array.from(answersElement.children).forEach((child) => {
+                if (child.innerHTML === quizData[currentQuestionIndex].correct) {
+                    child.style.backgroundColor = 'green';
+                }
+            });
+        }
+        setTimeout(() => {
+            currentQuestionIndex++;
+            generateQuiz();
+        }, feedbackTime);
     }
 
-    function exitQuiz() {
-        currentQuestionIndex = 0;
-        score = 0;
-        quizData = []; // Reset quiz data
-        initialOptionsElement.style.display = 'block';
-        departmentOptionsElement.style.display = 'none';
+    function showScore() {
         questionElement.style.display = 'none';
         answersElement.style.display = 'none';
-        scoreElement.style.display = 'none';
-        walletElement.style.display = 'none';
-        cancelButton.style.display = 'none';
-        clearInterval(countdownInterval);
-        clearTimeout(countdownTimeout);
-        countdownElement.innerHTML = '';
+        countdownElement.style.display = 'none';
+        scoreElement.innerHTML = `Your final score is ${score} out of ${quizData.length}`;
     }
 
     playForFreeButton.addEventListener('click', () => {
@@ -175,22 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
         departmentOptionsElement.style.display = 'block';
     });
 
-    addFundsButton.addEventListener('click', () => {
-        // Simulate login or prompt for login here
-        walletElement.style.display = 'block';
-    });
-
-    cancelButton.addEventListener('click', () => {
-        const confirmExit = confirm('Are you sure you want to cancel the quiz?');
-        if (confirmExit) {
-            clearInterval(countdownInterval);
-            clearTimeout(countdownTimeout);
-            countdownElement.innerHTML = '';
-            location.reload(); // Reload the page to refresh the quiz
-        }
-    });
-
-    // Populate questions based on department selected
     departmentOptionsElement.addEventListener('click', (event) => {
         if (event.target.tagName === 'BUTTON') {
             const department = event.target.getAttribute('data-department');
@@ -198,4 +203,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    cancelButton.addEventListener('click', () => {
+        // Reset quiz
+        currentQuestionIndex = 0;
+        score = 0;
+        initialOptionsElement.style.display = 'block';
+        departmentOptionsElement.style.display = 'none';
+        questionOptionsElement.style.display = 'none';
+        questionElement.style.display = 'none';
+        answersElement.style.display = 'none';
+        scoreElement.style.display = 'none';
+        walletElement.style.display = 'none';
+        countdownElement.style.display = 'none';
+        cancelButton.style.display = 'none'; // Hide cancel button
+    });
 });
