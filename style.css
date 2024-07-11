@@ -27,11 +27,6 @@ body {
     width: 85%;
     text-align: center;
     color: lightblue;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
 }
 
 .question {
@@ -43,7 +38,6 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
-    align-items: center;
 }
 
 .answer {
@@ -114,16 +108,10 @@ button:hover {
 
 /* Mobile View */
 @media (max-width: 600px) {
-    body {
-        overflow: hidden; /* Prevent scrolling */
-    }
-
     .container {
         width: 95%;
         padding: 10px;
-        margin: 0; /* Remove margin */
-        height: 100vh; /* Full viewport height */
-        justify-content: center;
+        margin: 10px;
     }
 
     .heading {
@@ -139,14 +127,12 @@ button:hover {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 10px;
-        justify-content: center;
-        align-items: center;
     }
 
     .answer {
         font-size: 22px;
         padding: 2px;
-        margin: 10px;
+        margin: 10;
         height: 45px; /* Set a fixed height */
         display: flex;
         align-items: center;
