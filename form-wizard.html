@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--favicon-->
+    <link rel="icon" href="assets/images/favicon-32x32.png" type="image/png" />
+    <!--plugins-->
+    <link href="assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+    <link href="assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />
+    <link href="assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet" />
+    <!-- loader-->
+    <link href="assets/css/pace.min.css" rel="stylesheet" />
+    <script src="assets/js/pace.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-extended.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="assets/css/app.css" rel="stylesheet">
+    <link href="assets/css/icons.css" rel="stylesheet">
+    <!-- Paystack JS -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+</head>
+
+<body>
+    <!--wrapper-->
+    <div class="wrapper">
+        <div class="page-wrapper">
+            <div class="page-content">
+                <div class="card">
+                    <div class="card-body p-4">
+                        <h5 class="mb-4">REGISTRATION FEE</h5>
+                        <!-- Form Start -->
+
+
+                        <form id="PaymentForm">
+                            <div class="row mb-3">
+                                <label for="input49" class="col-sm-3 col-form-label">Enter Your Name</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class='bx bx-user'></i></span>
+                                        <input type="text" class="form-control" id="input49" placeholder="Your Correct Name" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label for="input50" class="col-sm-3 col-form-label">Phone No</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class='bx bx-phone'></i></span>
+                                        <input type="text" class="form-control" id="input50" placeholder="Correct Phone No" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label for="input51" class="col-sm-3 col-form-label">Email Address</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class='bx bx-envelope'></i></span>
+                                        <input type="text" class="form-control" id="email-address" placeholder="Correct Email" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label for="input52" class="col-sm-3 col-form-label">Amount</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class='bx bx-wallet-alt'></i></span>
+                                        <input type="text" class="form-control" id="amount" value="5000" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <label for="input53" class="col-sm-3 col-form-label">Country</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class='bx bx-flag'></i></span>
+                                        <input type="text" class="form-control" id="input53" value="Nigeria" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+
+                            <div class="row mb-3">
+                                <label class="col-sm-3 col-form-label"></label>
+                                <div class="col-sm-9">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="input54" required>
+                                        <label class="form-check-label" for="input54">Check me out</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-sm-3 col-form-label"></label>
+                                <div class="col-sm-9">
+                                    <div class="d-md-flex d-grid align-items-center gap-3">
+                                        <button type="submit" onclick="PayWithPaystack()" class="btn btn-primary px-4">Submit</button>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- Form End -->
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <!--plugins-->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/plugins/simplebar/js/simplebar.min.js"></script>
+    <script src="assets/plugins/metismenu/js/metisMenu.min.js"></script>
+    <script src="assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
+    <!--app JS-->
+    <script src="assets/js/app.js"></script>
+    <!-- Paystack Payment Script -->
+    <script src="assets/js/payment.js"></script>
+    
+</body>
+
+</html>
